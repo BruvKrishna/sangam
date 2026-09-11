@@ -7,18 +7,18 @@
 
 ---
 
-## 📌 Executive Summary
+## Executive Summary
 
 **SANGAM** is an AI-assisted decision-support platform designed to automate and optimize the scheduling of maintenance traffic/power blocks across departments (Engineering, S&T, Traction/Electrical, General) for Indian Railways. 
 
 By combining **AI-based multi-criteria task prioritization** with **Google OR-Tools CP-SAT constraint programming**, SANGAM generates mathematically optimal, conflict-free block plans while preserving human-in-the-loop approval workflows.
 
-> ⚠️ **PROTOTYPE DISCLAIMER:**  
+> **PROTOTYPE DISCLAIMER:**  
 > This application is a **functional prototype** built for Smart India Hackathon 2026. It utilizes realistic **synthetic/demo data** and does **not** claim live integration with active Indian Railways operational production systems (TMS, SMMS, TDMS, COA, BDMS).
 
 ---
 
-## ⚙️ Core Architecture & High-Level Workflow
+##  Core Architecture & High-Level Workflow
 
 ```
 [ Conceptual Railway Data Sources ]
@@ -48,7 +48,7 @@ By combining **AI-based multi-criteria task prioritization** with **Google OR-To
 
 ---
 
-## 🧮 1. AI Priority Engine
+##  1. AI Priority Engine
 
 SANGAM calculates a normalized **Priority Score (0–100)** for every maintenance task using a multi-factor weighted scoring model:
 
@@ -63,7 +63,7 @@ For every task, SANGAM generates human-readable explanations explaining **why** 
 
 ---
 
-## 🧩 2. Optimization Engine (Google OR-Tools CP-SAT)
+##  2. Optimization Engine (Google OR-Tools CP-SAT)
 
 SANGAM uses **Google OR-Tools CP-SAT (Constraint Programming - Satisfiability)** to transform prioritized tasks into a feasible, time-slotted block schedule.
 
@@ -81,7 +81,7 @@ SANGAM uses **Google OR-Tools CP-SAT (Constraint Programming - Satisfiability)**
 
 ---
 
-## 🖥️ Technology Stack
+##  Technology Stack
 
 | Layer | Technology |
 | :--- | :--- |
@@ -93,7 +93,7 @@ SANGAM uses **Google OR-Tools CP-SAT (Constraint Programming - Satisfiability)**
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 sangam/
@@ -163,39 +163,8 @@ docker-compose up --build
 
 ---
 
-## 🎬 5–7 Minute SIH Prototype Demonstration Walkthrough
 
-When presenting SANGAM to SIH judges or railway mentors, follow this structured demo flow:
 
-1. **Dashboard Overview (1 min):**  
-   Open `http://localhost:5173`. Show top-level KPI cards (Total Tasks: 66, Overdue: 18, Block Hours: 98.4h). Point out **AI Recommendations** highlighting multi-department coordination opportunities on Section SEC-A.
-
-2. **Maintenance Tasks & AI Explainability (1 min):**  
-   Navigate to **Maintenance Tasks**. Search/filter by department or section. Click a high-priority task (e.g. `ENG-005` or `SNT-003`) to open the **Task Detail** page. Explain the 5-factor priority score breakdown chart and the human-readable explanation section (*"Why was this task prioritized?"*).
-
-3. **Block Planner & CP-SAT Optimization (1.5 min):**  
-   Navigate to **Block Planner**. Select a planning date (`2026-09-10`). Click **Run Optimization**. Watch CP-SAT solve the constraint model in ~0.02 seconds. Inspect the interactive **Gantt Chart** showing color-coded scheduled blocks across departments with shared coordination slots.
-
-4. **Conflict Detection & What-If Analysis (1 text/min):**  
-   Navigate to **Conflict Center** to inspect detected overlapping tasks. Click **Open What-If**. Test a scenario (e.g. *Remove Task* or *Extend Block*). Click **Run Scenario** to see side-by-side metric comparison (Current vs New Plan delta indicators).
-
-5. **Human Review & Approval (1 min):**  
-   Navigate to **Review & Approval**. Demonstrate human-in-the-loop control: click **Approve** or **Reject** on proposed schedule blocks. Show how approved blocks update task statuses across the system.
-
-6. **Reports & Architecture (0.5 min):**  
-   Navigate to **Reports** to preview and export the *Daily Block Plan*. Conclude on **Data Sources & System About** to highlight conceptual railway integration (TMS/SMMS/TDMS) and team details.
-
----
-
-## 🔮 Future Scope & Production Roadmap
-
-- **Live Integration:** Secure REST/Kafka integration with COA, TMS, SMMS, and TDMS railway databases.
-- **Dynamic Re-planning:** Real-time optimization updates triggered by train delays or sudden asset failures.
-- **ML Failure Prediction:** Integrate predictive maintenance models to feed risk probabilities directly into urgency scores.
-- **Enterprise Features:** Role-based access control (RBAC), divisional hierarchy support, and audit trail logs.
-
----
-
-## 📄 License & Team Credits
+##  License & Team Credits
 Developed for **Smart India Hackathon 2026** by Team **SubwaySurfers**.  
 *Prototype created for SIH Problem Statement SIH26027.*
