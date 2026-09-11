@@ -350,11 +350,16 @@ export const fetchConflicts = async () => {
           type: 'Overlapping Maintenance',
           description: 'Cross-department tasks on same section without compatibility',
           section: 'SEC-B',
+          task_ids: ['ENG-014', 'SNT-008'],
+          task_a: { id: 'ENG-014', name: 'Gauge Irregularity Correction', dept: 'Engineering', section: 'SEC-B' },
+          task_b: { id: 'SNT-008', name: 'OFC Maintenance', dept: 'S&T', section: 'SEC-B' },
           tasks: [
             { task_id: 'ENG-014', task_name: 'Gauge Irregularity Correction', department_id: 'DEPT-ENG', section: 'SEC-B', preferred_window: '11:00-15:00' },
             { task_id: 'SNT-008', task_name: 'OFC Maintenance', department_id: 'DEPT-SNT', section: 'SEC-B', preferred_window: '07:00-11:00' }
           ],
-          recommended_action: 'Reschedule SNT-008 to avoid overlap with ENG-014',
+          overlap_time: '1h 00m',
+          recommendation: 'Reschedule SNT-008 to morning slot (07:00) to avoid overlap with ENG-014 track possession.',
+          recommended_action: 'Reschedule SNT-008 to morning slot (07:00) to avoid overlap with ENG-014 track possession.',
           status: 'open'
         },
         {
@@ -363,11 +368,16 @@ export const fetchConflicts = async () => {
           type: 'Overlapping Maintenance',
           description: 'Cross-department tasks on same section without compatibility',
           section: 'SEC-B',
+          task_ids: ['ENG-014', 'SNT-019'],
+          task_a: { id: 'ENG-014', name: 'Gauge Irregularity Correction', dept: 'Engineering', section: 'SEC-B' },
+          task_b: { id: 'SNT-019', name: 'Track Circuit Testing', dept: 'S&T', section: 'SEC-B' },
           tasks: [
             { task_id: 'ENG-014', task_name: 'Gauge Irregularity Correction', department_id: 'DEPT-ENG', section: 'SEC-B', preferred_window: '11:00-15:00' },
             { task_id: 'SNT-019', task_name: 'Track Circuit Testing', department_id: 'DEPT-SNT', section: 'SEC-B', preferred_window: '10:00-14:00' }
           ],
-          recommended_action: 'Reschedule SNT-019 to avoid overlap with ENG-014',
+          overlap_time: '45m',
+          recommendation: 'Execute SNT-019 immediately prior to gauge correction under caution order.',
+          recommended_action: 'Execute SNT-019 immediately prior to gauge correction under caution order.',
           status: 'open'
         }
       ],
