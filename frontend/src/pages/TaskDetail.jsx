@@ -110,7 +110,33 @@ export default function TaskDetail() {
             <div className="text-sm text-slate-500">out of 100</div>
           </div>
 
-          <PriorityBar breakdown={breakdown} />
+          <PriorityBar score={task.priority_score} breakdown={breakdown} />
+
+          {/* ML Risk Card */}
+          {priorityDetail?.ml_risk && (
+            <div className="mt-5 p-4 rounded-xl border bg-slate-50 border-slate-200">
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                  🤖 ML Asset Failure Risk Probability
+                </h4>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${
+                  priorityDetail.ml_risk.risk_level === 'CRITICAL' ? 'text-red-700 bg-red-50 border-red-200' :
+                  priorityDetail.ml_risk.risk_level === 'HIGH' ? 'text-orange-700 bg-orange-50 border-orange-200' :
+                  priorityDetail.ml_risk.risk_level === 'MODERATE' ? 'text-amber-700 bg-amber-50 border-amber-200' :
+                  'text-green-700 bg-green-50 border-green-200'
+                }`}>
+                  {priorityDetail.ml_risk.risk_level} Risk
+                </span>
+              </div>
+              <p className="text-2xl font-black text-slate-900 mb-2">
+                {priorityDetail.ml_risk.failure_risk_score?.toFixed(1)}
+                <span className="text-sm font-normal text-slate-500 ml-1">/ 100</span>
+              </p>
+              <p className="text-xs text-slate-500 italic">
+                Predicted by {priorityDetail.ml_risk.model_type}
+              </p>
+            </div>
+          )}
 
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">

@@ -73,11 +73,15 @@ export default function SystemAbout() {
             </li>
             <li className="flex justify-between border-b border-slate-100 py-2">
               <span className="font-medium">Backend Framework</span>
-              <span>Python 3.11 FastAPI</span>
+              <span>Python 3.10+ FastAPI</span>
             </li>
             <li className="flex justify-between border-b border-slate-100 py-2">
               <span className="font-medium">Optimization Engine</span>
               <span>Google OR-Tools CP-SAT Solver</span>
+            </li>
+            <li className="flex justify-between border-b border-slate-100 py-2">
+              <span className="font-medium">Machine Learning</span>
+              <span>Scikit-Learn Random Forest Regressor</span>
             </li>
           </ul>
         </div>
@@ -85,9 +89,11 @@ export default function SystemAbout() {
         <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
           <h2 className="text-lg font-bold text-slate-800 mb-4">Prototype Highlights (v1.1)</h2>
           <ul className="list-disc list-inside space-y-2 text-sm text-slate-600">
+            <li>ML-driven Asset Failure Risk scoring with Feature Importance Attribution.</li>
+            <li>Dynamic Priority Engine with preset strategies (Monsoon Mode, High-Speed, Safety Focus).</li>
+            <li>Google OR-Tools CP-SAT constraint optimization for block allocation.</li>
             <li>Interactive What-If Scenario simulation with metric comparison.</li>
             <li>Multi-department track block coordination suggestions.</li>
-            <li>Dynamic AI Priority scoring explainability per task.</li>
             <li>Human-in-the-loop schedule review and approval workflow.</li>
           </ul>
         </div>

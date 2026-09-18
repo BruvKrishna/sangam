@@ -41,10 +41,10 @@ class DataStore:
         self.tasks: Dict[str, Task] = {}
         for t in self.tasks_raw:
             task = Task(**t)
-            score, breakdown = calculate_priority(task)
+            score, breakdown, ml_risk = calculate_priority(task)
             task.priority_score = round(score, 2)
             task.priority_breakdown = breakdown
-            task.explanation = generate_explanation(task, breakdown)
+            task.explanation = generate_explanation(task, breakdown, ml_risk)
             self.tasks[task.id] = task
 
         # Schedule and conflict stores

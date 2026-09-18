@@ -12,6 +12,7 @@ export default function ReviewApproval() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
+  const [feedback, setFeedback] = useState(null);
 
   const loadData = async () => {
     try {
@@ -33,11 +34,14 @@ export default function ReviewApproval() {
   const handleAction = async (scheduleId, action) => {
     try {
       setActionLoading(scheduleId);
-      await submitApproval(scheduleId, action, 'Current User', 'Action from ReviewApproval UI');
+      setFeedback(null);
+      await submitApproval(scheduleId, action, 'SANGAM Section Controller', `Action ${action} submitted via Review & Approval Portal`);
       await loadData();
+      setFeedback({ type: 'success', message: `Schedule ${scheduleId} marked as ${action} successfully.` });
+      setTimeout(() => setFeedback(null), 4000);
     } catch (err) {
       console.error(err);
-      alert('Failed to submit approval: ' + err.message);
+      setFeedback({ type: 'error', message: 'Failed to submit approval: ' + (err.message || 'Unknown error') });
     } finally {
       setActionLoading(null);
     }
@@ -56,6 +60,15 @@ export default function ReviewApproval() {
           Refresh List
         </button>
       </div>
+
+      {feedback && (
+        <div className={`p-4 rounded-xl text-sm font-medium flex items-center justify-between border ${
+          feedback.type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-300' : 'bg-red-50 text-red-800 border-red-300'
+        }`}>
+          <span>{feedback.message}</span>
+          <button onClick={() => setFeedback(null)} className="text-xs underline font-semibold ml-4">Dismiss</button>
+        </div>
+      )}
 
       <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-center gap-4 text-sm font-medium text-slate-600 mb-6">
         <div className="flex items-center gap-2"><span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">1</span> Optimization Run</div>

@@ -421,46 +421,71 @@ export const runWhatIf = async (scenario) => {
 };
 
 // ============ Priority ============
-export const calculatePriority = async (taskId) => {
+export const calculatePriority = async (taskId, customWeights = null) => {
   try {
+    const body = { task_id: taskId };
+    if (customWeights) body.custom_weights = customWeights;
     return await apiFetch('/priority/calculate', {
       method: 'POST',
-      body: JSON.stringify({ task_id: taskId }),
+      body: JSON.stringify(body),
     });
   } catch {
+    // Offline fallback: compute score dynamically from FALLBACK tasks
+    const task = FALLBACK.tasks?.find(t => t.id === taskId);
+    const weights = customWeights || {
+      criticality: 0.30, urgency: 0.25, overdue_score: 0.20,
+      asset_impact: 0.15, safety_relevance: 0.10,
+    };
+    if (task) {
+      const raw = {
+        criticality: task.criticality ?? 70,
+        urgency: task.urgency ?? 60,
+        overdue_score: task.overdue_score ?? 50,
+        asset_impact: task.asset_impact ?? 60,
+        safety_relevance: task.safety_relevance ?? 40,
+      };
+      const breakdown = {};
+      let score = 0;
+      for (const [k, w] of Object.entries(weights)) {
+        const contrib = (raw[k] ?? 50) * w;
+        breakdown[k] = parseFloat(contrib.toFixed(2));
+        score += contrib;
+      }
+      return {
+        task_id: taskId,
+        task_name: task.name || taskId,
+        score: parseFloat(score.toFixed(2)),
+        breakdown,
+        raw_scores: raw,
+        weights,
+        explanation: [
+          `Criticality ${raw.criticality}/100 — offline estimate.`,
+          `Urgency ${raw.urgency}/100 — offline estimate.`,
+          'Connect to backend for full ML-based analysis.',
+        ],
+        ml_risk: null,
+      };
+    }
+    // absolute last-resort generic fallback
     return {
       task_id: taskId,
-      task_name: 'Track Geometry Inspection',
-      score: 78.5,
+      task_name: taskId,
+      score: 50.0,
       breakdown: {
-        criticality: 27.0,
-        urgency: 20.0,
-        overdue_score: 16.0,
-        asset_impact: 10.5,
-        safety_relevance: 5.0
+        criticality: 15.0, urgency: 12.5, overdue_score: 10.0,
+        asset_impact: 7.5, safety_relevance: 5.0,
       },
       raw_scores: {
-        criticality: 90,
-        urgency: 80,
-        overdue_score: 80,
-        asset_impact: 70,
-        safety_relevance: 50
+        criticality: 50, urgency: 50, overdue_score: 50,
+        asset_impact: 50, safety_relevance: 50,
       },
-      weights: {
-        criticality: 0.30,
-        urgency: 0.25,
-        overdue_score: 0.20,
-        asset_impact: 0.15,
-        safety_relevance: 0.10
-      },
-      explanation: [
-        'High task criticality (90/100) — critical for safe operations.',
-        'High urgency (80/100) — requires priority window allocation.',
-        'Task is overdue (score 80/100) — maintenance cycle exceeded.'
-      ]
+      weights,
+      explanation: ['Backend unavailable — showing generic estimate.'],
+      ml_risk: null,
     };
   }
 };
+
 
 export const fetchPriorityFormula = async () => {
   try {

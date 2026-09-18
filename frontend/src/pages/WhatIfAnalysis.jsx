@@ -1,22 +1,39 @@
-import React, { useState } from 'react';
-import { runWhatIf } from '../api/client';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { runWhatIf, fetchTasks } from '../api/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import ChartCard from '../components/common/ChartCard';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorState from '../components/common/ErrorState';
-import { GitBranch, Play, CheckCircle2, RotateCcw } from 'lucide-react';
+import { GitBranch, Play, CheckCircle2, RotateCcw, Calendar, ArrowRight } from 'lucide-react';
 
 export default function WhatIfAnalysis() {
+  const navigate = useNavigate();
+  const [tasks, setTasks] = useState([]);
   const [scenarioType, setScenarioType] = useState('extend_block');
-  const [scenarioParams, setScenarioParams] = useState({ taskId: 'ENG-014', duration: '90', date: '2026-09-10' });
+  const [scenarioParams, setScenarioParams] = useState({ taskId: 'ENG-001', duration: '90', date: '2026-09-10' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+  const [appliedToast, setAppliedToast] = useState(false);
+
+  useEffect(() => {
+    fetchTasks().then(res => {
+      const taskList = res.tasks || [];
+      setTasks(taskList);
+      if (taskList.length > 0) {
+        setScenarioParams(prev => ({ ...prev, taskId: taskList[0].id }));
+      }
+    }).catch(err => {
+      console.error('Failed to load tasks for what-if selector', err);
+    });
+  }, []);
 
   const handleRun = async () => {
     try {
       setLoading(true);
       setError(null);
+      setAppliedToast(false);
       const data = await runWhatIf({
         type: scenarioType,
         params: scenarioParams,
@@ -28,6 +45,13 @@ export default function WhatIfAnalysis() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleApply = () => {
+    setAppliedToast(true);
+    setTimeout(() => {
+      setAppliedToast(false);
+    }, 6000);
   };
 
   const getMetricColor = (current, next, inverse = false) => {
@@ -56,6 +80,25 @@ export default function WhatIfAnalysis() {
         </div>
       </div>
 
+      {appliedToast && (
+        <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-800 flex items-center justify-between shadow-sm animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span className="text-sm font-semibold">
+              Scenario successfully applied to active planning session!
+            </span>
+          </div>
+          <button
+            onClick={() => navigate('/planner')}
+            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors"
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            View in Block Planner
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
           <GitBranch className="w-5 h-5 text-blue-600" />
@@ -76,14 +119,26 @@ export default function WhatIfAnalysis() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">Target Task ID / Asset</label>
-            <input
-              type="text"
-              value={scenarioParams.taskId}
-              onChange={e => setScenarioParams({ ...scenarioParams, taskId: e.target.value })}
-              className="w-full rounded-lg border-slate-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500 font-mono"
-              placeholder="e.g. ENG-014"
-            />
+            <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">Target Task / Asset</label>
+            {tasks.length > 0 ? (
+              <select
+                value={scenarioParams.taskId}
+                onChange={e => setScenarioParams({ ...scenarioParams, taskId: e.target.value })}
+                className="w-full rounded-lg border-slate-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+              >
+                {tasks.map(t => (
+                  <option key={t.id} value={t.id}>{t.id} - {t.name}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={scenarioParams.taskId}
+                onChange={e => setScenarioParams({ ...scenarioParams, taskId: e.target.value })}
+                className="w-full rounded-lg border-slate-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500 font-mono"
+                placeholder="e.g. ENG-001"
+              />
+            )}
           </div>
           <div>
             <label className="block text-xs font-semibold uppercase text-slate-500 mb-1">Duration / Value</label>
@@ -106,7 +161,7 @@ export default function WhatIfAnalysis() {
             </button>
             {result && (
               <button
-                onClick={() => setResult(null)}
+                onClick={() => { setResult(null); setAppliedToast(false); }}
                 className="p-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-slate-600"
                 title="Reset scenario"
               >
@@ -148,13 +203,13 @@ export default function WhatIfAnalysis() {
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex gap-3">
               <button
-                onClick={() => alert('Scenario applied to active planning session!')}
+                onClick={handleApply}
                 className="flex-1 px-4 py-2.5 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors shadow-sm"
               >
                 Apply Scenario
               </button>
               <button
-                onClick={() => setResult(null)}
+                onClick={() => { setResult(null); setAppliedToast(false); }}
                 className="flex-1 px-4 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
               >
                 Discard
@@ -186,3 +241,4 @@ export default function WhatIfAnalysis() {
     </div>
   );
 }
+
