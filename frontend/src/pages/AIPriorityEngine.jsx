@@ -193,18 +193,21 @@ export default function AIPriorityEngine() {
                         <div className="space-y-1.5">
                           {Object.entries(priorityData.ml_risk.feature_importance)
                             .sort(([, a], [, b]) => b - a)
-                            .map(([feat, imp]) => (
-                              <div key={feat} className="flex items-center gap-2 text-xs">
-                                <span className="w-28 capitalize opacity-80">{feat.replace(/_/g, ' ')}</span>
-                                <div className="flex-1 bg-white bg-opacity-60 rounded-full h-1.5">
-                                  <div
-                                    className="h-1.5 rounded-full bg-current opacity-60"
-                                    style={{ width: `${(imp * 100).toFixed(0)}%` }}
-                                  />
+                            .map(([feat, imp]) => {
+                              const val = typeof imp === 'number' ? imp : parseFloat(imp) || 0;
+                              return (
+                                <div key={feat} className="flex items-center gap-2 text-xs">
+                                  <span className="w-28 capitalize opacity-80 shrink-0">{feat.replace(/_/g, ' ')}</span>
+                                  <div className="flex-1 bg-white bg-opacity-60 rounded-full h-1.5 overflow-hidden">
+                                    <div
+                                      className="h-1.5 rounded-full bg-current opacity-70 transition-all duration-300"
+                                      style={{ width: `${Math.min(100, Math.max(0, val))}%` }}
+                                    />
+                                  </div>
+                                  <span className="w-12 text-right opacity-80 font-mono shrink-0">{val.toFixed(1)}%</span>
                                 </div>
-                                <span className="w-10 text-right opacity-70">{(imp * 100).toFixed(1)}%</span>
-                              </div>
-                            ))}
+                              );
+                            })}
                         </div>
                       </div>
                     )}
