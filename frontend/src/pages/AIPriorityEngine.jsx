@@ -58,9 +58,14 @@ export default function AIPriorityEngine() {
         fetchTasks()
       ]);
       setFormulaData(fData);
-      setTasks(tData.tasks);
-      if (tData.tasks.length > 0) {
-        setSelectedTaskId(tData.tasks[0].id);
+      const taskList = tData?.tasks || [];
+      setTasks(taskList);
+      if (taskList.length > 0) {
+        const firstId = taskList[0].id;
+        setSelectedTaskId(firstId);
+        // Pre-calculate immediately so there is never a blank state
+        const pData = await calculatePriority(firstId, DEFAULT_WEIGHTS);
+        setPriorityData(pData);
       }
     } catch (err) {
       setError(err.message || 'Failed to load priority engine data');
@@ -80,12 +85,15 @@ export default function AIPriorityEngine() {
   }, [selectedTaskId]);
 
   const handleCalculate = async (taskId, customWeights) => {
+    if (!taskId) return;
     try {
       setCalcLoading(true);
-      const data = await calculatePriority(taskId, customWeights);
-      setPriorityData(data);
+      const data = await calculatePriority(taskId, customWeights || weights);
+      if (data) {
+        setPriorityData(data);
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Failed to calculate priority:', err);
     } finally {
       setCalcLoading(false);
     }
