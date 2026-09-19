@@ -13,8 +13,16 @@ def calculate_task_priority(req: PriorityRequest):
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    score, breakdown = calculate_priority(task)
-    explanation = generate_explanation(task, breakdown)
+    score, breakdown, ml_risk = calculate_priority(task, custom_weights=req.custom_weights)
+    explanation = generate_explanation(task, breakdown, ml_risk=ml_risk)
+
+    active_weights = req.custom_weights or {
+        "criticality": 0.30,
+        "urgency": 0.25,
+        "overdue_score": 0.20,
+        "asset_impact": 0.15,
+        "safety_relevance": 0.10,
+    }
 
     return {
         "task_id": task.id,
@@ -28,14 +36,9 @@ def calculate_task_priority(req: PriorityRequest):
             "asset_impact": task.asset_impact,
             "safety_relevance": task.safety_relevance,
         },
-        "weights": {
-            "criticality": 0.30,
-            "urgency": 0.25,
-            "overdue_score": 0.20,
-            "asset_impact": 0.15,
-            "safety_relevance": 0.10,
-        },
+        "weights": active_weights,
         "explanation": explanation,
+        "ml_risk": ml_risk,
     }
 
 

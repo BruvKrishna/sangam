@@ -5,6 +5,9 @@ export default function PriorityBar({ score, breakdown }) {
   const colors = {
     criticality: 'bg-red-500',
     urgency: 'bg-amber-500',
+    overdue_score: 'bg-orange-400',
+    asset_impact: 'bg-blue-500',
+    safety_relevance: 'bg-green-500',
     impact: 'bg-blue-500',
     dependencies: 'bg-purple-500',
     other: 'bg-slate-300'

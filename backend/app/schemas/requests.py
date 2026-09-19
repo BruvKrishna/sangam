@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 class OptimizationRequest(BaseModel):
     planning_date: str
@@ -15,6 +15,7 @@ class WhatIfRequest(BaseModel):
 
 class PriorityRequest(BaseModel):
     task_id: str
+    custom_weights: Optional[Dict[str, float]] = None
 
 class UpdateTaskStatusRequest(BaseModel):
     status: str

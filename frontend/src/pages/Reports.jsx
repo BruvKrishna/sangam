@@ -12,6 +12,7 @@ export default function Reports() {
   const [selectedDate, setSelectedDate] = useState('2026-09-10');
   const [reportResult, setReportResult] = useState(null);
   const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState(null);
 
   useEffect(() => {
     const loadTypes = async () => {
@@ -31,11 +32,12 @@ export default function Reports() {
   const handleGenerate = async (typeId) => {
     try {
       setGenerating(true);
+      setGenerateError(null);
       setReportResult(null);
       const result = await generateReport(typeId, selectedDate);
       setReportResult(result);
     } catch (err) {
-      alert('Failed to generate report: ' + err.message);
+      setGenerateError('Failed to generate report: ' + (err.message || 'Unknown error'));
     } finally {
       setGenerating(false);
     }
@@ -95,6 +97,18 @@ export default function Reports() {
         ))}
       </div>
 
+      {generateError && (
+        <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>{generateError}</span>
+          </div>
+          <button onClick={() => setGenerateError(null)} className="text-xs font-semibold text-red-600 hover:underline">
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {generating && (
         <div className="mt-8 p-12 bg-white rounded-xl shadow-sm border border-slate-200">
           <LoadingSpinner message="Aggregating divisional data and generating report..." />
@@ -110,10 +124,7 @@ export default function Reports() {
             </h2>
             <div className="flex gap-2">
               <button onClick={handlePrint} className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
-                <Printer className="w-3.5 h-3.5" /> Print
-              </button>
-              <button onClick={handlePrint} className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs font-semibold flex items-center gap-1.5 shadow-sm">
-                <Download className="w-3.5 h-3.5" /> Export PDF
+                <Printer className="w-3.5 h-3.5" /> Print / Save PDF
               </button>
             </div>
           </div>
